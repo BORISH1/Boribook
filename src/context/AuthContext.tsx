@@ -31,6 +31,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setIsLoading(false);
       }
+    }).catch((error) => {
+      console.error('Error getting session:', error);
+      setIsLoading(false);
     });
 
     // Listen for auth changes
@@ -58,10 +61,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
-      setProfile(data);
+      if (error) {
+        console.error('Error fetching profile:', error);
+        // Continue anyway - profile might not exist yet
+        setProfile(null);
+      } else {
+        setProfile(data);
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      setProfile(null);
     } finally {
       setIsLoading(false);
     }
